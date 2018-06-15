@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Xunit;
 
 namespace System.Diagnostics.Tests
@@ -61,15 +62,17 @@ namespace System.Diagnostics.Tests
         [Fact]
         public void SkipFrames_CallMethod_ReturnsExpected()
         {
-            StackFrame stackFrame = CallMethod(1);
             MethodInfo expectedMethod = typeof(StackFrameTests).GetMethod(nameof(SkipFrames_CallMethod_ReturnsExpected));
 #if DEBUG
+            StackFrame stackFrame = CallMethod(1);
             Assert.Equal(expectedMethod, stackFrame.GetMethod());
 #else
-            Assert.NotEqual(expectedMethod, stackFrame.GetMethod());
+            StackFrame stackFrame = CallMethod(0);
+            Assert.Equal(expectedMethod, stackFrame.GetMethod());
 #endif
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public StackFrame CallMethod(int skipFrames) => new StackFrame(skipFrames);
 
         [Theory]
